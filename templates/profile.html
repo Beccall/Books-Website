@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block heading %}
+Welcome to your profile, {{ username }}
+{% endblock %}
+{% block body %}
+
+<form action="{{ url_for('profile') }}" method="post">
+    <input type="text" name="title" placeholder="Search for book">
+    <button>Enter</button>
+</form>
+<h1>{{ statement }}</h1>
+
+
+<a href="logoff">log out! </a>
+
+
+
+{% endblock %}
