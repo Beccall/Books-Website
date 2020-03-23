@@ -6,8 +6,16 @@ Book results:
 {% endblock %}
 
 {% block body %}
-<a href="{{ url_for('book', book_id=book.id)}}">
-    {{book.isbn}}: {{book.title}}, written by: {{book.author}}, year: {{book.year}}
-</a>
+
+<ul>
+    {% for i in book %}
+    <li>
+        <a href="{{ url_for('book', book_id=i.id)}}">
+            {{i.isbn}}: {{i.title}}, written by: {{i.author}}, year: {{i.year}}
+        </a>
+    </li>
+    {% endfor %}
+</ul>
+
 
 {% endblock %}

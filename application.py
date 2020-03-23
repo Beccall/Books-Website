@@ -69,14 +69,15 @@ def profile():
     if request.method == "GET":
         return render_template("profile.html", username=session["username"])
     if request.method == "POST":
-        title = request.form.get("title")
-        searched_item = db.execute("SELECT * FROM books WHERE title = :title", {"title": title}).fetchone()
+        book_name = request.form.get("title")
+        searched_item = db.execute("SELECT * FROM books WHERE title like :search", {"search": '%' + book_name + '%'}).fetchall()
         session["book"] = searched_item
-        if searched_item is not None:
+        if searched_item:
             return redirect("/books")
+
         else:
             statement = "No results found :( "
-        return render_template("profile.html", username=session["username"], title=title,
+        return render_template("profile.html", username=session["username"], title=book_name,
                                searched_item=searched_item, book=session["book"], statement=statement)
 
 
@@ -87,8 +88,8 @@ def books():
 
 @app.route("/book/<int:book_id>", methods=["GET"])
 def book(book_id):
-    # book_info = db.execute("SELECT * FROM books WHERE id = :id", {"id": book_id}).fetchone()
-    return render_template("book.html", username=session["username"], book=session["book"])
+    book_info = db.execute("SELECT * FROM books WHERE id = :id", {"id": book_id}).fetchone()
+    return render_template("book.html", book=book_info)
 
 
 @app.route("/logoff", methods=["GET", "POST"])
