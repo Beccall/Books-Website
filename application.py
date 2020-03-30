@@ -5,6 +5,7 @@ from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from werkzeug.utils import redirect
+import requests
 
 from models import *
 
@@ -30,21 +31,26 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/registration", methods=["GET"])
+# @app.route("/registration", methods=["GET"])
+# def register():
+#     return render_template("registration.html")
+
+
+@app.route("/registration", methods=["GET", "POST"])
 def register():
-    return render_template("registration.html")
+    if request.method == "GET":
+        return render_template("registration.html")
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        db.execute("INSERT INTO login (username, password) VALUES (:username, :password)",
+                   {"username": username, "password": password})
+        db.commit()
+        session["username"] = username
 
-
-@app.route("/registration", methods=["POST"])
-def register2():
-    username = request.form.get("username")
-    password = request.form.get("password")
-
-    db.execute("INSERT INTO login (username, password) VALUES (:username, :password)",
-               {"username": username, "password": password})
-    db.commit()
-
-    return render_template("registration.html", username=username, password=password)
+        if request.method =="POST":
+            return redirect('/profile')
+        return render_template("registration.html", username=username, password=password)
 
 
 @app.route("/logon", methods=["GET", "POST"])
@@ -58,10 +64,9 @@ def login():
         user_info = db.execute("SELECT * FROM login WHERE username = :username", {"username": username}).fetchone()
         if password == user_info.password:
             return redirect("/profile")
-
         else:
-            hello = "Wrong password"
-    return render_template("logon.html", username=username, password=password, hello=hello)
+            statement = "Wrong password"
+    return render_template("logon.html", username=username, password=password, statement=statement)
 
 
 @app.route("/profile", methods=["GET", "POST"])
@@ -70,7 +75,8 @@ def profile():
         return render_template("profile.html", username=session["username"])
     if request.method == "POST":
         book_name = request.form.get("title")
-        searched_item = db.execute("SELECT * FROM books WHERE title like :search", {"search": '%' + book_name + '%'}).fetchall()
+        searched_item = db.execute('SELECT * FROM books WHERE isbn ilike :search OR title ilike :search OR author '
+                                   'ilike :search OR year ilike :search', {"search": '%' + book_name + '%'}).fetchall()
         session["book"] = searched_item
         if searched_item:
             return redirect("/books")
@@ -81,24 +87,53 @@ def profile():
                                searched_item=searched_item, book=session["book"], statement=statement)
 
 
-@app.route("/books", methods=["GET", "POST"])
+@app.route("/books", methods=["GET"])
 def books():
-    return render_template("books.html", username=session["username"], book=session["book"])
+    return render_template("books.html", book=session["book"])
 
 
-@app.route("/book/<int:book_id>", methods=["GET"])
+@app.route("/book/<int:book_id>/", methods=["GET", "POST"])
 def book(book_id):
     book_info = db.execute("SELECT * FROM books WHERE id = :id", {"id": book_id}).fetchone()
-    return render_template("book.html", book=book_info)
+    key = "RZM6NJic0yxuUPAgBGhfA"
+    res = requests.get(" https://www.goodreads.com/book/review_counts.json",
+                       params={"key": key, "isbns": book_info.isbn})
+    data = res.json()
+    avg_review = data["books"][0]["average_rating"]
+
+    username = session["username"]
+    user = db.execute("SELECT * FROM login WHERE username = :username", {"username": username}).fetchone()
+    user_id = user.id
+    all_reviews = db.execute("SELECT * FROM reviews WHERE book = :book", {"book": book_id}).fetchall()
+    more_reviews = db.execute("SELECT username, book, point, review FROM login JOIN reviews ON reviews.user_name = "
+                              "login.id WHERE book = :book", {"book": book_id}).fetchall()
+
+    can_post = 0
+    for reviews in all_reviews:
+        if reviews.user_name == user_id:
+            can_post += 1
+    if request.method == "GET":
+        return render_template("book.html", book=book_info, avg_review=avg_review, all_reviews=all_reviews, more_reviews=more_reviews)
+    if request.method == "POST":
+        if can_post > 0:
+            statement = "You can not review again. "
+            return render_template("book.html", book=book_info, avg_review=avg_review, statement=statement, all_reviews=all_reviews, more_reviews=more_reviews)
+        else:
+            review = request.form.get("review")
+            review_text = request.form.get("review_text")
+            db.execute("INSERT INTO reviews (book, user_name, point, review) VALUES (:book, :user_name, :point, "
+                       ":review)",
+                       {"book": book_id, "user_name": user_id, "point": review, "review": review_text})
+            statement = "Review has been submitted! "
+            db.commit()
+            return render_template("book.html", book=book_info, all_reviews=all_reviews, avg_review=avg_review, review=review, review_text=review_text, statement=statement, more_reviews=more_reviews)
 
 
 @app.route("/logoff", methods=["GET", "POST"])
 def logout():
-    if request.method == "GET":
+    if request.method == "POST":
         return render_template("logoff.html")
     if request.method == "POST":
         session.pop("username", None)
         return redirect("/logon")
-    return render_template("logoff.html", username=session["username"])
-
-#
+    return render_template("logoff.html")
