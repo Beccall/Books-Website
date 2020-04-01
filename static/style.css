@@ -1,0 +1,62 @@
+.title
+{
+    color: red;
+    font-weight: 700;
+    font-size:  80px;
+    font-family: Times Header;
+    align: center;
+
+}
+
+.list
+{
+    color: blue;
+}
+
+.book_list_title
+{
+    color: black;
+    font-weight: 700;
+}
+
+.book_list_info
+{
+    color: black;
+    font-weight: 200;
+}
+
+div
+{
+padding-left: 30px;
+}
+
+.card-title
+{
+color: blue;
+font-family: Times Header;
+font-size: 50px;
+}
+
+.review_info
+{
+font-weight: bold;
+font-size: 20px
+}
+
+
+.actual_review
+{
+font-size: 15px
+}
+
+#title
+{
+font-size: 22px
+font-weight: bold;
+}
+
+.center
+{
+  padding: 20px;
+  text-align: center;
+}

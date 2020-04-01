@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block heading %}
+<div> Lets search for some books! </div>
+{% endblock %}
+{% block body %}
+
+{% if statement %}
+<div class="alert alert-danger" role="alert">
+    {{ statement }}
+</div>
+{% endif %}
+
+<form action="{{ url_for('search') }}" method="post">
+    <div class="form-group">
+        <input type="text" class="form-control" name="title" placeholder="Search">
+        <label>Search by Title, Author, ISBN, Year.</label><br>
+        <button>Enter</button>
+    </div>
+</form>
+
+
+
+
+
+
+{% endblock %}

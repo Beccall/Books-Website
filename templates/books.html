@@ -1,21 +1,24 @@
 {% extends "layout.html" %}
 
 {% block heading %}
-Book results:
+Book results: for "{{ search }}"
 
 {% endblock %}
 
 {% block body %}
 
-<ul>
+
+<ul class="list-group">
     {% for i in book %}
-    <li>
-        <a href="{{ url_for('book', book_id=i.id)}}">
-            {{i.isbn}}: {{i.title}}, written by: {{i.author}}, year: {{i.year}}
+    <li class="list-group-item ">
+        <a href="{{ url_for('book', book_id=i.id)}}" style="text-decoration: none">
+            <button type="button" class="list-group-item list-group-item-action" >
+                <div class="book_list_title"> {{i.title}} </div>
+                <div class="book_list_info" >written by: {{i.author}}, year: {{i.year}}, isbn: {{i.isbn}} </div>
+            </button>
         </a>
     </li>
     {% endfor %}
 </ul>
-
 
 {% endblock %}

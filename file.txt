@@ -22,3 +22,8 @@
 
 <a href="{{ url_for('book', book_id=searched_item.id)}}">
 <a href="{{ url_for('book', book=book)}}"> {{book_info}} </a>
+
+
+SELECT * FROM books WHERE isbn like '%1982%' OR title like '%1982%' OR author like '%1982%' OR year like '%1982%';
+
+ALTER TABLE books ALTER COLUMN year TYPE varchar;

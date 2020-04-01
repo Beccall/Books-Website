@@ -1,10 +1,13 @@
 {% extends "layout.html" %}
 
 {% block heading %}
-Welcome to my webpage!
+Welcome to BookBookBooks!
 {% endblock %}
 
 {% block body %}
-<a href="registration">Register for an account! </a>
-<a href="logon">Returning users: Log in here! </a>
+<div class="center">
+    <a class="btn btn-primary" href="registration" role="button">Not a member? Register here!</a>
+    <a class="btn btn-primary" href="logon" role="button">Already a user? log in now</a>
+</div>
+
 {% endblock %}

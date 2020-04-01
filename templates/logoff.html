@@ -5,7 +5,9 @@ Would you like to log out?
 {% endblock %}
 
 {% block body %}
+
 <form action="{{ url_for('logout') }}" method="post">
-    <button>Enter</button>
+    <div class="center"><button class="btn btn-danger">Push here to continue to log out.</button></div>
+
 </form>
 {% endblock %}

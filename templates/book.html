@@ -1,13 +1,98 @@
+{% extends "layout.html" %}
 
 {% block heading %}
-Book information
 {% endblock %}
 
 {% block body %}
-<ul>
-    <li>ISBN: {{book.isbn}} </li>
-    <li>Title: {{book.title}} </li>
-    <li>Author: {{book.author}} </li>
-    <li>Year: {{book.year}}</li>
+
+{% if statement %}
+<div class="alert alert-primary" role="alert">
+    {{ statement }}
+</div>
+{% endif %}
+
+
+<div  style="width: 100rem;">
+    <div class="card-body">
+        <h5 class="card-title">{{book.title}}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">ISBN: {{book.isbn}}</h6>
+        <p class="card-text">Written by {{book.author}}<br>Published in {{book.year}} <br>Avg Rating: {{avg_review}} Stars<br>Total Reviews: {{total_count}} </p>
+
+    </div>
+</div>
+
+
+<ul class="list-group list-group-flush">
+    {% if more_reviews %}
+    <li class="list-group-item" id="title">Here are the reviews for this book. Add your own review below! <br><br></>
+    {% else %}
+    <li class="list-group-item" id="title">This book has no reviews. Please leave a review!<br><br></li>
+    {% endif %}
+
+    {% for review in more_reviews %}
+    <li class="list-group-item">
+        <p class="book_list_title">User: {{ review.username }} <br> Rating: {{ review.point }}/5 &#9733 </p>
+        <p class="book_list_info"> {{ review.review }}</p>
+    </li>
+    {% endfor %}
 </ul>
+
+
+
+<form action="{{ url_for('book', book_id=book.id) }}" method="post">
+    <label class="col-sm-3 col-form-label">Add Your Rating and Review! </label>
+    <fieldset class="form-group">
+        <div class="row" >
+            <div class="col-sm-10">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="review" id="review1" value="1">
+                    <label class="form-check-label" for="review1">
+                        1 Star
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="review" id="review2" value="2">
+                    <label class="form-check-label" for="review2">
+                        2 Star
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="review" id="review3" value="3">
+                    <label class="form-check-label" for="review3">
+                        3 Star
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="review" id="review4" value="4">
+                    <label class="form-check-label" for="review4">
+                        4 Star
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="review" id="review5" value="5">
+                    <label class="form-check-label" for="review5">
+                        5 Star
+                    </label>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+    <div class="form-group row">
+        <div class="col-sm-10">
+            <input name="review_text" type="text" class="form-control"  >
+        </div>
+    </div>
+
+
+    <div class="form-group row" >
+        <div class="col-sm-10">
+            <button type="submit" class="btn btn-primary">Enter</button>
+        </div>
+    </div>
+</form>
+
+
+
+
+
 {% endblock %}

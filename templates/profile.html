@@ -5,14 +5,22 @@ Welcome to your profile, {{ username }}
 {% endblock %}
 {% block body %}
 
-<form action="{{ url_for('profile') }}" method="post">
-    <input type="text" name="title" placeholder="Search for book">
-    <button>Enter</button>
-</form>
-<h1>{{ statement }}</h1>
+{% if user_reviews: %}
+Here are your book reviews:
+{% else %}
+You have not submitted any book reviews.
+{% endif %}
+
+<ul class="list-group">
+{% for review in user_reviews %}
+<li class="list-group-item">
+    <div class="book_list_title"> {{ review.title }}: {{ review.point }}/5 &#9733 </div>
+    <div class="book_list_info"> {{ review.review }} </div>
+</li>
+{% endfor %}
+</ul>
 
 
-<a href="logoff">log out! </a>
 
 
 
