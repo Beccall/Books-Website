@@ -21,24 +21,3 @@ CREATE TABLE reviews(
     review VARCHAR
 );
 
-ALTER TABLE reviews ADD COLUMN review VARCHAR;
-
-INSERT INTO reviews
-    (book, user_name, point)
-    VALUES (5464, 7, '5'
-    );
-
-INSERT INTO reviews
-    (book, user_name, point, review)
-    VALUES (5464, 8, '1', 'basically crap'
-    );
-
-INSERT INTO reviews
-    (book, user_name, point, review)
-    VALUES (5464, 10, '4', ''
-    );
-
-SELECT title FROM books JOIN reviews ON reviews.book = books.id;
-SELECT username, book, point, review FROM login JOIN reviews ON reviews.user_name = login.id;
-
-ALTER TABLE books ALTER COLUMN isbn TYPE varchar;

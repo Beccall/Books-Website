@@ -1,13 +1,27 @@
 {% extends "layout.html" %}
 
 {% block heading %}
-Welcome to BookBookBooks!
+{% if message %}
+    {{ message }}
+{% else %}
+    Welcome to BookBookBooks!
+{% endif %}
 {% endblock %}
 
 {% block body %}
+
+{% if message %}
+<div class="center">
+    <a class="btn btn-primary" href="profile" role="button">Visit your profile page</a>
+    <a class="btn btn-primary" href="search" role="button">Search for new books</a>
+</div>
+
+{% else %}
 <div class="center">
     <a class="btn btn-primary" href="registration" role="button">Not a member? Register here!</a>
     <a class="btn btn-primary" href="logon" role="button">Already a user? log in now</a>
 </div>
+
+{% endif %}
 
 {% endblock %}

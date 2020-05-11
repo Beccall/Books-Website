@@ -7,12 +7,11 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from werkzeug.utils import redirect
 import requests
 
-from models import *
-
 app = Flask(__name__)
 
 # Check for environment variable
-if not "postgres://nibcjksikejyqm:d9780941b69e9a14c322e1229e69328dbb12d80f1b45b1ce48f8a9cb4e8b0926@ec2-35-171-31-33.compute-1.amazonaws.com:5432/dff5f1uksmubk5":
+if not "postgres://nibcjksikejyqm:d9780941b69e9a14c322e1229e69328dbb12d80f1b45b1ce48f8a9cb4e8b0926@ec2-35-171-31-33" \
+       ".compute-1.amazonaws.com:5432/dff5f1uksmubk5":
     raise RuntimeError("DATABASE_URL is not set")
 
 # Configure session to use filesystem
@@ -22,13 +21,18 @@ Session(app)
 
 # Set up database
 engine = create_engine(
-    "postgres://nibcjksikejyqm:d9780941b69e9a14c322e1229e69328dbb12d80f1b45b1ce48f8a9cb4e8b0926@ec2-35-171-31-33.compute-1.amazonaws.com:5432/dff5f1uksmubk5")
+    "postgres://nibcjksikejyqm:d9780941b69e9a14c322e1229e69328dbb12d80f1b45b1ce48f8a9cb4e8b0926@ec2-35-171-31-33"
+    ".compute-1.amazonaws.com:5432/dff5f1uksmubk5")
 db = scoped_session(sessionmaker(bind=engine))
 
 
 @app.route("/", methods=["GET"])
 def index():
-    return render_template("index.html")
+
+    message = None
+    if 'username' in session:
+        message = f"Welcome back, {session['username']}"
+    return render_template("index.html", message=message)
 
 
 @app.route("/registration", methods=["GET", "POST"])
@@ -40,7 +44,7 @@ def register():
         username = request.form.get("username")
         password = request.form.get("password")
         check_user = db.execute("SELECT * FROM login WHERE username = :username", {"username": username}).fetchone()
-        if check_user is None and len(password) > 8:
+        if check_user is None and len(password) >= 8:
             db.execute("INSERT INTO login (username, password) VALUES (:username, :password)",
                        {"username": username, "password": password})
             db.commit()
@@ -59,7 +63,7 @@ def register():
 @app.route("/logon", methods=["GET", "POST"])
 def login():
     if "username" in session:
-        return redirect("/profile")
+        return redirect("/")
     else:
         if request.method == "GET":
             return render_template("logon.html")
@@ -69,7 +73,7 @@ def login():
             session["username"] = username
             user_info = db.execute("SELECT * FROM login WHERE username = :username", {"username": username}).fetchone()
             if password == user_info.password:
-                return redirect("/profile")
+                return redirect("/")
             else:
                 statement = "Wrong password"
             return render_template("logon.html", username=username, password=password, statement=statement)
@@ -190,7 +194,7 @@ def book_api(book_isbn):
 
     return jsonify({
         "title": book.title,
-        "author": book.title,
+        "author": book.author,
         "year": book.year,
         "isbn": book.isbn,
         "review_count": total_count,
