@@ -71,7 +71,7 @@ def login():
             username = request.form.get("username")
             password = request.form.get("password")
             user_info = db.execute("SELECT * FROM login WHERE username = :username", {"username": username}).fetchone()
-            if password == user_info.password:
+            if user_info is not None and password == user_info.password:
                 session["username"] = username
                 return redirect("/")
             else:
