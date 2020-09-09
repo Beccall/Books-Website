@@ -70,9 +70,9 @@ def login():
         if request.method == "POST":
             username = request.form.get("username")
             password = request.form.get("password")
-            session["username"] = username
             user_info = db.execute("SELECT * FROM login WHERE username = :username", {"username": username}).fetchone()
             if password == user_info.password:
+                session["username"] = username
                 return redirect("/")
             else:
                 statement = "Wrong password"
